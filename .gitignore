@@ -1,0 +1,3 @@
+db/ecommerce.db
+__pycache__/
+*.pyc
