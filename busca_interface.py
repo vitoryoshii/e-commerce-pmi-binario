@@ -1,13 +1,49 @@
+"""
+===========================================================
+COMPARATIVO DE ALGORITMOS DE BUSCA - LINEAR X BINÁRIA
+Autor: Vitor Yoshii
+Descrição:
+    Este programa compara o desempenho entre dois algoritmos
+    de busca — Linear e Binária — usando dados criados de um 
+    e-comerce. A interface gráfica (Tkinter) permite que o 
+    usuário digite o ID de um produto e visualize:
+        • Tempo de execução de cada algoritmo em milissegundos (ms)
+        • Quantidade de passos realizados
+        • Nome e preço do produto encontrado
+
+Conceitos de aplicações abordados:
+    - Estruturas de dados (listas, dicionários)
+    - Busca Linear e Binária
+    - Acesso a banco de dados SQLite
+    - Interface gráfica com Tkinter
+    - Medição de desempenho com time.perf_counter_ns()
+===========================================================
+"""
+
+
 import sqlite3
 import time
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox # Exibe alerta e mensagens para o usuário
 
 
 # ------------------------------
 # FUNÇÕES DE BUSCA BINÁRIA E LINEAR
 # ------------------------------
 def busca_linear(lista, alvo):
+    """
+    Realiza uma busca linear (sequencial) em uma lista.
+    
+    Parâmetros:
+        lista (list): lista de elementos a serem percorridos
+        alvo (int): valor a ser encontrado
+
+    Retorna:
+        tuple(bool, int): 
+            - True se o elemento for encontrado, False caso contrário
+            - Quantidade de passos realizados até o término da busca
+    """
+
     passos = 0
     for item in lista:
         passos += 1
@@ -17,6 +53,23 @@ def busca_linear(lista, alvo):
 
 
 def busca_binaria(lista, alvo):
+    """
+    Realiza uma busca binária em uma lista ORDENADA.
+    
+    Parâmetros:
+        lista (list): lista ordenada de elementos
+        alvo (int): valor a ser encontrado
+
+    Retorna:
+        tuple(bool, int): 
+            - True se o elemento for encontrado, False caso contrário
+            - Quantidade de passos realizados até o término da busca
+
+    Observação:
+        A busca binária divide o problema pela metade a cada iteração,
+        tornando uma busca muito mais eficiente que a busca linear.
+    """
+
     esquerda = 0
     direita = len(lista) - 1
     passos = 0
@@ -39,10 +92,12 @@ print("🔄 - Carregando dados do banco...")
 
 conn = sqlite3.connect("db/ecommerce.db")
 cursor = conn.cursor()
+
 cursor.execute("""
     SELECT id_produto, nome_produto, preco
     FROM produtos
 """)
+
 dados = cursor.fetchall()
 conn.close()
 
@@ -56,6 +111,14 @@ print(f"✅ - {len(ids)} produtos carregados.")
 # FUNÇÃO DE REALIZAR BUSCA E ATUALIZAR INTERFACE
 # ------------------------------
 def realizar_busca():
+    """
+    Função responsável por:
+        - Capturar o ID digitado pelo usuário;
+        - Executar a busca linear e binária;
+        - Medir o tempo e número de passos de cada algoritmo;
+        - Exibir os resultados na interface.
+    """
+
     try:
         id_busca = int(entry_id.get())
     except ValueError:
@@ -97,38 +160,67 @@ janela.title("Comparativo de Busca Linear x Binária")
 janela.geometry("520x360")
 janela.config(bg="#f2f2f2")
 
-# TÍTULO
-titulo = tk.Label(janela, text="🧠 Comparativo de Algoritmos de Busca", 
-                  font=("Segoe UI", 14, "bold"), bg="#f2f2f2")
+# ---- TÍTULO ----
+titulo = tk.Label(
+    janela, 
+    text="🧠 Comparativo de Algoritmos de Busca", 
+    font=("Segoe UI", 14, "bold"), 
+    bg="#f2f2f2"
+)
 titulo.pack(pady=15)
 
-# ENTRADA DE DADOS
+# ---- ENTRADA DE DADOS ----
 frame_input = tk.Frame(janela, bg="#f2f2f2")
 frame_input.pack(pady=5)
-tk.Label(frame_input, text="Digite o ID do produto:", font=("Segoe UI", 11), bg="#f2f2f2").grid(row=0, column=0, padx=5)
+
+tk.Label(
+    frame_input, 
+    text="Digite o ID do produto:", 
+    font=("Segoe UI", 11), bg="#f2f2f2"
+).grid(row=0, column=0, padx=5)
+
 entry_id = tk.Entry(frame_input, font=("Segoe UI", 11), width=20)
 entry_id.grid(row=0, column=1, padx=5)
 
-# BOTÃO DE BUSCA
-btn_buscar = tk.Button(janela, text="🔍 Buscar Produto", font=("Segoe UI", 11, "bold"),
-                       bg="#4CAF50", fg="white", relief="flat", command=realizar_busca)
+# ---- BOTÃO DE BUSCA ----
+btn_buscar = tk.Button(
+    janela, 
+    text="🔍 Buscar Produto", 
+    font=("Segoe UI", 11, "bold"),
+    bg="#4CAF50", 
+    fg="white", 
+    relief="flat", 
+    command=realizar_busca
+)
 btn_buscar.pack(pady=10)
 
-# RESULTADOS
+# ---- RESULTADOS ----
 resultado_text = tk.StringVar()
-label_resultado = tk.Label(janela, textvariable=resultado_text, font=("Segoe UI", 11),
-                           bg="#f2f2f2", fg="#333", justify="center")
+
+label_resultado = tk.Label(
+    janela, 
+    textvariable=resultado_text, 
+    font=("Segoe UI", 11),
+    bg="#f2f2f2", fg="#333", 
+    justify="center"
+)
 label_resultado.pack(pady=15)
 
-# COMPARATIVO DE TEMPOS
+# ---- COMPARATIVO DE TEMPOS ----
 label_linear = tk.Label(janela, text="🔹 Linear: --", font=("Segoe UI", 10), bg="#f2f2f2")
 label_linear.pack(pady=2)
 
 label_binaria = tk.Label(janela, text="🔹 Binária: --", font=("Segoe UI", 10), bg="#f2f2f2")
 label_binaria.pack(pady=2)
 
-# RODAPÉ
-rodape = tk.Label(janela, text="Desenvolvido por Vitor Yoshii 🧠", font=("Segoe UI", 9, "italic"), bg="#f2f2f2", fg="#666")
+# ---- RODAPÉ ----
+rodape = tk.Label(
+    janela, 
+    text="Desenvolvido por Vitor Yoshii 🧠", 
+    font=("Segoe UI", 9, "italic"), 
+    bg="#f2f2f2", 
+    fg="#666"
+)
 rodape.pack(side="bottom", pady=10)
 
 janela.mainloop()
