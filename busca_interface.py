@@ -89,7 +89,6 @@ def busca_binaria(lista, alvo):
 # CARREGAR DADOS DO BANCO DE DADOS PARA MEMÓRIA
 # ------------------------------
 print("🔄 - Carregando dados do banco...")
-
 conn = sqlite3.connect("db/ecommerce.db")
 cursor = conn.cursor()
 
@@ -97,7 +96,6 @@ cursor.execute("""
     SELECT id_produto, nome_produto, preco
     FROM produtos
 """)
-
 dados = cursor.fetchall()
 conn.close()
 
