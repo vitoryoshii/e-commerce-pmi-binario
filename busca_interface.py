@@ -2,14 +2,17 @@
 ===========================================================
 COMPARATIVO DE ALGORITMOS DE BUSCA - LINEAR X BINÁRIA
 Autor: Vitor Yoshii
+
 Descrição:
     Este programa compara o desempenho entre dois algoritmos
-    de busca — Linear e Binária — usando dados criados de um 
-    e-comerce. A interface gráfica (Tkinter) permite que o 
-    usuário digite o ID de um produto e visualize:
-        • Tempo de execução de cada algoritmo em milissegundos (ms)
-        • Quantidade de passos realizados
-        • Nome e preço do produto encontrado
+    de busca Linear e Binária, utilizando dados fictícios de 
+    um e-comerce armazenados em um banco de dados. 
+    
+    A interface gráfica (Tkinter) permite que o usuário:
+        - Informe o ID de um produto (entre 10.000.000 e 20.000.000);
+        - Veja o tempo de execução (ms);
+        - Compara a quantidade de passos de cada algoritimo;
+        - Visualize o nome e preço do produto encontrado.
 
 Conceitos de aplicações abordados:
     - Estruturas de dados (listas, dicionários)
@@ -27,9 +30,9 @@ import tkinter as tk
 from tkinter import messagebox # Exibe alerta e mensagens para o usuário
 
 
-# ------------------------------
+# ===========================================================
 # FUNÇÕES DE BUSCA BINÁRIA E LINEAR
-# ------------------------------
+# ===========================================================
 def busca_linear(lista, alvo):
     """
     Realiza uma busca linear (sequencial) em uma lista.
@@ -85,36 +88,45 @@ def busca_binaria(lista, alvo):
     return False, passos
 
 
-# ------------------------------
-# CARREGAR DADOS DO BANCO DE DADOS PARA MEMÓRIA
-# ------------------------------
-print("🔄 - Carregando dados do banco...")
-conn = sqlite3.connect("db/ecommerce.db")
-cursor = conn.cursor()
+# ===========================================================
+# FUNÇÕES DE BANCO DE DADOS
+# ===========================================================
+def carregar_dados(caminho_db="db/ecommerce.db"):
+    """
+    Carrega os dados do banco SQLite para a memória.
 
-cursor.execute("""
-    SELECT id_produto, nome_produto, preco
-    FROM produtos
-""")
-dados = cursor.fetchall()
-conn.close()
+    Retorna:
+        tuple(list, dict): 
+            - Lista de IDs dos produtos
+            - Dicionário com ID como chave e (nome, preço) como valor
+    """
+    print("🔄 Carregando dados do banco...")
 
-ids = [linha[0] for linha in dados]
-produtos = {linha[0]: (linha[1], linha[2]) for linha in dados}
+    conn = sqlite3.connect(caminho_db)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id_produto, nome_produto, preco
+        FROM produtos
+    """)
+    dados = cursor.fetchall()
+    conn.close()
 
-print(f"✅ - {len(ids)} produtos carregados.")
+    ids = [linha[0] for linha in dados]
+    produtos = {linha[0]: (linha[1], linha[2]) for linha in dados}
+
+    print(f"✅ {len(ids)} produtos carregados.")
+    return ids, produtos
 
 
-# ------------------------------
-# FUNÇÃO DE REALIZAR BUSCA E ATUALIZAR INTERFACE
-# ------------------------------
+# ===========================================================
+# FUNÇÃO DE REALIZAR BUSCA
+# ===========================================================
 def realizar_busca():
     """
     Função responsável por:
         - Capturar o ID digitado pelo usuário;
         - Executar a busca linear e binária;
         - Medir o tempo e número de passos de cada algoritmo;
-        - Exibir os resultados na interface.
     """
 
     try:
@@ -142,83 +154,88 @@ def realizar_busca():
     # ---- EXIBIR RESULTADOS ----
     if encontrado_linear or encontrado_binaria:
         nome, preco = produtos[id_busca]
-        resultado_text.set(f"Produto encontrado:\n📦 {nome}\n💰 R$ {preco:.2f}")
+        resultado_text.set(f"Produto encontrado:\n📦 {nome}\n💰 R$ {preco:.2f}") 
     else:
-        resultado_text.set("❌ Produto não encontrado.")
+        resultado_text.set("❌ Produto não encontrado.") 
 
     label_linear["text"] = f"🔹 Linear: {tempo_linear:.6f} ms | {passos_linear} passos"
     label_binaria["text"] = f"🔹 Binária: {tempo_binaria:.6f} ms | {passos_binaria} passos"
 
 
-# ------------------------------
+# ===========================================================
 # INTERFACE GRÁFICA COM TKINTER
-# ------------------------------
-janela = tk.Tk()
-janela.title("Comparativo de Busca Linear x Binária")
-janela.geometry("520x360")
-janela.config(bg="#f2f2f2")
+# ===========================================================
+def criar_interface():
+    """
+    Cria a interface gráfica do programa.
+    """
+    global entry_id, resultado_text, label_linear, label_binaria
 
-# ---- TÍTULO ----
-titulo = tk.Label(
-    janela, 
-    text="🧠 Comparativo de Algoritmos de Busca", 
-    font=("Segoe UI", 14, "bold"), 
-    bg="#f2f2f2"
-)
-titulo.pack(pady=15)
+    janela = tk.Tk()
+    janela.title("Comparativo de Busca Linear x Binária")
+    janela.geometry("520x360")
+    janela.config(bg="#f2f2f2")
 
-# ---- ENTRADA DE DADOS ----
-frame_input = tk.Frame(janela, bg="#f2f2f2")
-frame_input.pack(pady=5)
+    # ---- TÍTULO ----
+    titulo = tk.Label(
+        janela, 
+        text="🧠 Comparativo de Algoritmos de Busca", 
+        font=("Segoe UI", 14, "bold"), 
+        bg="#f2f2f2"
+    )
+    titulo.pack(pady=15)
 
-tk.Label(
-    frame_input, 
-    text="Digite o ID do produto:", 
-    font=("Segoe UI", 11), bg="#f2f2f2"
-).grid(row=0, column=0, padx=5)
+    # ---- ENTRADA DE DADOS ----
+    frame_input = tk.Frame(janela, bg="#f2f2f2")
+    frame_input.pack(pady=5)
 
-entry_id = tk.Entry(frame_input, font=("Segoe UI", 11), width=20)
-entry_id.grid(row=0, column=1, padx=5)
+    tk.Label(
+        frame_input, 
+        text="Digite o ID do produto:", 
+        font=("Segoe UI", 11), bg="#f2f2f2"
+    ).grid(row=0, column=0, padx=5)
 
-# ---- BOTÃO DE BUSCA ----
-btn_buscar = tk.Button(
-    janela, 
-    text="🔍 Buscar Produto", 
-    font=("Segoe UI", 11, "bold"),
-    bg="#4CAF50", 
-    fg="white", 
-    relief="flat", 
-    command=realizar_busca
-)
-btn_buscar.pack(pady=10)
+    entry_id = tk.Entry(frame_input, font=("Segoe UI", 11), width=20)
+    entry_id.grid(row=0, column=1, padx=5)
 
-# ---- RESULTADOS ----
-resultado_text = tk.StringVar()
+    # ---- BOTÃO DE BUSCA ----
+    tk.Button(
+        janela, 
+        text="🔍 Buscar Produto", 
+        font=("Segoe UI", 11, "bold"),
+        bg="#4CAF50", fg="white", relief="flat", 
+        command=realizar_busca
+    ).pack(pady=10)
 
-label_resultado = tk.Label(
-    janela, 
-    textvariable=resultado_text, 
-    font=("Segoe UI", 11),
-    bg="#f2f2f2", fg="#333", 
-    justify="center"
-)
-label_resultado.pack(pady=15)
+    # ---- RESULTADOS ----
+    resultado_text = tk.StringVar()
 
-# ---- COMPARATIVO DE TEMPOS ----
-label_linear = tk.Label(janela, text="🔹 Linear: --", font=("Segoe UI", 10), bg="#f2f2f2")
-label_linear.pack(pady=2)
+    tk.Label(
+        janela, 
+        textvariable=resultado_text, 
+        font=("Segoe UI", 11), bg="#f2f2f2", fg="#333", 
+        justify="center"
+    ).pack(pady=15)
 
-label_binaria = tk.Label(janela, text="🔹 Binária: --", font=("Segoe UI", 10), bg="#f2f2f2")
-label_binaria.pack(pady=2)
+    # ---- COMPARATIVO DE TEMPOS ----
+    label_linear = tk.Label(janela, text="🔹 Linear: --", font=("Segoe UI", 10), bg="#f2f2f2")
+    label_linear.pack(pady=2)
 
-# ---- RODAPÉ ----
-rodape = tk.Label(
-    janela, 
-    text="Desenvolvido por Vitor Yoshii 🧠", 
-    font=("Segoe UI", 9, "italic"), 
-    bg="#f2f2f2", 
-    fg="#666"
-)
-rodape.pack(side="bottom", pady=10)
+    label_binaria = tk.Label(janela, text="🔹 Binária: --", font=("Segoe UI", 10), bg="#f2f2f2")
+    label_binaria.pack(pady=2)
 
-janela.mainloop()
+    # ---- RODAPÉ ----
+    tk.Label(
+        janela, 
+        text="Desenvolvido por Vitor Yoshii 🧠", 
+        font=("Segoe UI", 9, "italic"), bg="#f2f2f2", fg="#666"
+    ).pack(side="bottom", pady=10)
+
+    janela.mainloop()
+
+# ===========================================================
+# EXECUÇÃO PRINCIPAL
+# ===========================================================
+if __name__ == "__main__":
+    ids, produtos = carregar_dados()
+    criar_interface()
