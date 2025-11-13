@@ -1,21 +1,42 @@
 # 🧠 Comparativo de Algoritmos de Busca: Linear vs Binária
 
-Este projeto visa demonstrar e comparar visualmente a eficiência dos algoritmos de **Busca Linear** e **Busca Binária** (Binary Search) na recuperação de dados em uma base de produtos de E-commerce.
+Este projeto demonstra e compara **a eficiência dos algoritmos de busca Linear e Binária** na recuperação de dados de uma base de produtos de E-commerce, utilizando uma interface gráfica em **Tkinter**.
 
-O projeto utiliza a biblioteca **Tkinter** para criar uma interface gráfica simples (GUI) que permite ao usuário inserir um ID de produto e observar em tempo real o tempo de execução e o número de passos (comparações) de cada algoritmo.
+O objetivo é mostrar de forma prática a diferença entre as duas abordagens, evidenciando a performance e o número de passos necessários para encontrar um item dentro de grandes volumes de dados.
 
 ## 🌟 Destaques do Projeto
 
-* **Comparação de Performance:** Medição precisa do tempo de execução em nanossegundos e contagem exata de passos para ambos os métodos de busca.
-* **Interface Gráfica (Tkinter):** Permite uma interação amigável para o input de dados e visualização dos resultados.
-* **Simulação de Dados:** O código é estruturado para carregar dados de um banco de dados SQLite simulado (IDs de produtos ordenados) para realizar as buscas.
+- ⚡ **Comparação de performance:** Mede com precisão o tempo de execução (em nanossegundos) e o número de passos de cada algoritmo.  
+- 🖥️ **Interface Gráfica (Tkinter):** Permite ao usuário inserir um código de busca e visualizar os resultados em tempo real.  
+- 🧩 **Integração com Banco SQLite:** Os produtos são carregados diretamente de um banco de dados local.  
+- 🌀 **Códigos embaralhados (`codigo_busca`):** Cada produto recebe um código aleatório, simulando buscas não sequenciais e realistas.
 
 ## 🛠️ Tecnologias Utilizadas
 
-* **Python 3.x**
-* **Tkinter:** Para a interface gráfica.
-* **SQLite3:** Para simular o carregamento de dados do banco de dados (o arquivo `.db` não está incluído no repositório devido ao seu tamanho, mas o código de criação do banco de dados está presente).
-* **Módulos Padrão:** `time` e `messagebox`.
+- **Python 3.x**
+- **Tkinter** — Interface gráfica do usuário.
+- **SQLite3** — Banco de dados local (o arquivo `.db` não está incluído no repositório devido ao seu tamanho, mas o código de criação do banco de dados está presente).
+- **Módulos padrão:** `time`, `os`, `random`, `sqlite3`, `tkinter.messagebox`.
+
+## 🗂️ Estrutura do Projeto
+
+```bash
+e-commerce-pmi-binario/
+│
+├── db/
+│   └── ecommerce.db              # Banco de dados SQLite (gerado pelo script)
+│
+├── src/
+│   ├── __init__.py               # Define o pacote src
+│   ├── main.py                   # Ponto de entrada do sistema
+│   ├── database.py               # Conexão e carregamento dos dados do banco
+│   ├── buscas.py                 # Implementação dos algoritmos de busca (Linear e Binária)
+│   ├── interface.py              # Interface gráfica em Tkinter (comparativo de desempenho)
+│   └── popular_database.py       # Criação do banco e geração de dados aleatórios
+│
+├── .gitignore                    # Arquivos ignorados pelo Git
+└── README.md                     # Documentação do projeto
+```
 
 ## ⚙️ Como Executar o Projeto
 
@@ -33,31 +54,49 @@ Para executar este projeto, você precisará de um ambiente Python configurado.
     cd e-commerce-pmi-binario
     ```
 
-2.  **Preparar o Banco de Dados (Opcional - Simulação):**
+2.  **Preparar o Banco de Dados:**
     > **Atenção:** O arquivo `db/ecommerce.db` não está incluído no repositório. Para que o código funcione, é necessário criar um banco de dados com a estrutura esperada.
     >
-    > **Estrutura Esperada:** O código espera que o banco de dados `db/ecommerce.db` contenha a tabela `produtos` com as colunas `id_produto`, `nome_produto` e `preco`.
+    > **Estrutura Esperada:** O código espera que o banco de dados `db/ecommerce.db` contenha a tabela `produtos` com as colunas `id_produto`, `nome_produto`, `preco` e `codigo_busca`.
     >
-    > **Alternativa Simples:** Executar o código `db/setup_database.py`, esse scrit executa a criação de um banco de dados com valores aleatórios**.
+    > **Alternativa Simples:** Executar o código `src/popular_database.py`, esse scrit executa a criação de um banco de dados com valores aleatórios.
 
 3.  **Executar o Script:**
     ```bash
-    python db/setup_databese.py # Cria o banco de dados com 10.000.000 de valores aleatórios para o ecommerce
+    python src/popular_databese.py # Cria o banco de dados com 10.000.000 de valores aleatórios para o ecommerce
     
-    python busca_interface.py # Execução do código principal
+    python -m src.main # Execução do código principal
     ```
 
-## 🔍 Como Usar a Interface
+## 🧾 Como Usar a Interface
 
-1.  O aplicativo será aberto com a interface Tkinter.
-2.  No campo **"Digite o ID do produto:"**, insira um número inteiro (o código espera um ID entre 10.000.000 e 20.000.000, conforme a simulação do DB).
-3.  Clique no botão **"🔍 Buscar Produto"**.
-4.  Os resultados serão exibidos abaixo, mostrando:
-    * O nome e preço do produto encontrado.
-    * O tempo de execução em milissegundos (ms) para a Busca Linear.
-    * O número de passos (comparações) para a Busca Linear.
-    * O tempo de execução em milissegundos (ms) para a Busca Binária.
-    * O número de passos (comparações) para a Busca Binária.
+A interface foi criada com **Tkinter** e possui duas formas principais de busca:  
+🔹 **Busca por código do produto (comparativo de algoritmos)**  
+🔹 **Busca textual (por nome do produto, com paginação)**
+
+---
+
+### 🔍 1. Busca por Código do Produto
+
+1. No campo **"🔍 Digite o código do produto:"**, insira um número inteiro.  
+   - O código deve estar entre **10.000.000 e 20.000.000** (intervalo usado na simulação).
+2. Clique no botão **"Buscar Produto"**.
+3. O sistema fará duas buscas:
+   - **Busca Linear:** percorre a lista inteira.
+   - **Busca Binária:** utiliza divisão e comparação otimizada.
+4. O resultado exibirá:
+   - Nome e preço do produto encontrado.  
+   - Tempo de execução e número de passos para cada algoritmo.
+  
+---
+
+### 🧠 2. Busca Textual (por nome)
+
+1. No campo **"🧾 Buscar por nome (rejaques):"**, digite parte do nome de um produto.  
+   - Você pode digitar várias palavras (exemplo: `smartphone tech`).
+2. Clique em **"Pesquisar"**.
+3. O sistema exibirá todos os produtos que contêm as palavras digitadas.
+4. Use os botões **⬅️ Anterior** e **➡️ Próximo** para navegar entre os resultados.
 
 ## 📝 Algoritmos Implementados
 
