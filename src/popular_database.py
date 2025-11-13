@@ -1,10 +1,5 @@
 """
 ===========================================================
-SCRIPT: setup_database.py
-Autor: Vitor Yoshii / GitHub: @vitoryoshii
-Autor: Beatriz Silva 
-Data: 2025-11-11
-
 Descrição:
     Cria e popula o banco de dados 'ecommerce.db' com 
     10.000.000 produtos fictícios e gera códigos de busca
@@ -35,6 +30,8 @@ import os
 # ===========================================================
 # CONFIGURAÇÕES GERAIS
 # ===========================================================
+
+
 NOMES_PRODUTOS = [
     "Smartphone", "Notebook", "Teclado", "Mouse", 
     "Monitor", "Cadeira Gamer", "Fone de Ouvido", 
@@ -49,8 +46,13 @@ DB_FILE = os.path.join(DB_DIR, "ecommerce.db")
 # ===========================================================
 # FUNÇÃO: criar_banco
 # ===========================================================
+
+
 def criar_banco():
-    """Cria a pasta e o banco de dados com a tabela 'produtos'."""
+    """
+    Cria a pasta e o banco de dados com a tabela 'produtos'.
+    """
+
     if not os.path.exists(DB_DIR):
         os.makedirs(DB_DIR)
 
@@ -75,6 +77,8 @@ def criar_banco():
 # ===========================================================
 # FUNÇÃO: popular_banco
 # ===========================================================
+
+
 def popular_banco():
     """
     Popula o banco de dados com 10 milhões de produtos fictícios.
@@ -83,6 +87,7 @@ def popular_banco():
     - Nome e preço gerados aleatoriamente
     - Inserção em blocos de 50.000 registros para eficiência
     """
+
     print(f"🔗 Conectando ao banco: {DB_FILE}")
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
@@ -126,15 +131,17 @@ def popular_banco():
 # ===========================================================
 # FUNÇÃO: gerar_codigo_busca
 # ===========================================================
+
+
 def gerar_codigo_busca():
     """
     Gera e preenche a coluna 'codigo_busca' com valores únicos e aleatórios.
     """
+
     print("\n🎲 Iniciando geração dos códigos de busca...")
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
-    # Verifica se a coluna já existe
     cursor.execute("PRAGMA table_info(produtos);")
     colunas = [info[1] for info in cursor.fetchall()]
     if "codigo_busca" not in colunas:
@@ -142,17 +149,14 @@ def gerar_codigo_busca():
         cursor.execute("ALTER TABLE produtos ADD COLUMN codigo_busca INTEGER;")
         conn.commit()
 
-    # Pega todos os IDs
     cursor.execute("SELECT id_produto FROM produtos;")
     ids = [linha[0] for linha in cursor.fetchall()]
     total = len(ids)
     print(f"📦 Total de produtos: {total:,}")
 
-    # Gera códigos únicos e embaralhados
     codigos = list(range(10_000_000, 10_000_000 + total))
     random.shuffle(codigos)
 
-    # Atualiza em lotes
     print("💾 Atualizando banco (pode demorar alguns minutos)...")
     lotes = 50_000
     for i in range(0, total, lotes):
@@ -168,6 +172,8 @@ def gerar_codigo_busca():
 # ===========================================================
 # EXECUÇÃO PRINCIPAL
 # ===========================================================
+
+
 if __name__ == "__main__":
     criar_banco()
     popular_banco()
